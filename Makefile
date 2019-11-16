@@ -6,3 +6,7 @@ compile:
 .PHONY: install
 install:
 	go build -o $(DST_BIN_DIR)
+
+.PHONY: release
+release:
+	@bash scripts/release.sh
