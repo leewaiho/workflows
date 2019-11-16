@@ -21,3 +21,7 @@ func SendItems(items ...*aw.Item) {
 	wf.Feedback.Items = items
 	wf.SendFeedback()
 }
+
+func HandleError(e error, msg string) {
+	SendItems(NewItem(msg, e.Error(), nil, false))
+}

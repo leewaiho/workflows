@@ -4,4 +4,4 @@
 
 ## Feature
 
-- [ ] 快速生成TOTP
+- [x] 快速生成TOTP
