@@ -9,11 +9,12 @@ import (
 
 func init() {
 	rootCmd.AddCommand(otpCommand)
-	otpCommand.SetErr(&workflow.ErrorHandler{})
 }
 
 var otpCommand = &cobra.Command{
-	Use: "otp",
+	Use:     "otp",
+	Short:   "One Time Passcode 快速生成工具",
+	Version: "v1.0.0",
 	Run: func(cmd *cobra.Command, args []string) {
 		keys, e := readKeys()
 		if e != nil {
