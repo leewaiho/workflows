@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/qiniu/api.v7/v7/auth/qbox"
 	"github.com/qiniu/api.v7/v7/storage"
+	"github.com/spf13/viper"
 	"time"
 )
 
@@ -28,6 +29,15 @@ func NewClient(bucketName, accessKey, secretKey string) *Client {
 			SecretKey: secretKey,
 		},
 	}
+}
+
+func (c *Client) DeleteFile(key string) error {
+	cfg, e := c.newStorageConfig()
+	if e != nil {
+		return e
+	}
+	bucketManager := storage.NewBucketManager(c.mc, cfg)
+	return bucketManager.Delete(viper.GetString("qiniu.bucketName"), key)
 }
 
 func (c *Client) UploadFile(filename, filepath string) (*Response, error) {

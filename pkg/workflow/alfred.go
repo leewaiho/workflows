@@ -13,6 +13,10 @@ func NewItem(title, subtitle string, vars map[string]string, valid bool) *aw.Ite
 	return item
 }
 
+func SendItem(title, subtitle string, vars map[string]string, valid bool) {
+	SendItems(NewItem(title, subtitle, vars, valid))
+}
+
 func SendItems(items ...*aw.Item) {
 	if len(items) == 0 {
 		return

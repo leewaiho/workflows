@@ -8,6 +8,7 @@ import (
 	"github.com/qiniu/api.v7/v7/storage"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"log"
 	"path"
 	"strconv"
 	"time"
@@ -15,40 +16,45 @@ import (
 
 func init() {
 	rootCmd.AddCommand(storageCmd)
-	storageCmd.AddCommand(storageListCmd)
 	storageCmd.AddCommand(storagePutCmd)
+	storageCmd.AddCommand(storageDeleteCmd)
+	storageCmd.AddCommand(storageListCmd)
 }
 
 var (
 	storageCmd = &cobra.Command{
 		Use:   "storage",
-		Short: "QiNiu 对象存储快捷工具",
+		Short: "qiniu对象存储快捷工具",
 	}
 	storagePutCmd = &cobra.Command{
-		Use: "put",
+		Use:   "put",
+		Short: "上传文件",
 		Run: func(cmd *cobra.Command, args []string) {
-			wf := workflow.New()
 			s := new(StorageHandler)
 			client, e := s.newQiNiuClient()
 			if e != nil {
-				wf.Error(e, "初始七牛客户端异常")
+				workflow.SendItem("初始七牛客户端异常", e.Error(), nil, false)
 				return
 			}
+			total := len(args)
+			succeed := 0
+			failed := 0
 			for _, v := range args {
 				_, e := client.UploadFile(path.Base(v), v)
-				result := v + "保存成功"
 				if e != nil {
-					result = v + "保存失败, " + e.Error()
+					log.Println(v + "保存失败, " + e.Error())
+					failed++
+				} else {
+					log.Println(v + "保存成功")
+					succeed++
 				}
-				wf.AddItem(workflow.NewItem(v, result, map[string]string{
-					"name": v,
-				}, false))
 			}
-			wf.Send()
+			workflow.SendItem("上传文件完成", fmt.Sprintf("总共%d个,成功%d个,失败%d个", total, succeed, failed), nil, false)
 		},
 	}
 	storageListCmd = &cobra.Command{
-		Use: "list",
+		Use:   "list",
+		Short: "文件列表",
 		Run: func(cmd *cobra.Command, args []string) {
 			prefix := ""
 			if len(args) > 0 {
@@ -78,6 +84,30 @@ var (
 			}
 			wf.Send()
 			return
+		},
+	}
+	storageDeleteCmd = &cobra.Command{
+		Use:   "delete",
+		Short: "删除文件",
+		Run: func(cmd *cobra.Command, args []string) {
+			if len(args) != 1 {
+				errMsg := fmt.Sprintf("期望参数:1个, 实际参数%d个", len(args))
+				item := workflow.NewItem("删除文件失败", errMsg, nil, false)
+				workflow.SendItems(item)
+				return
+			}
+			s := new(StorageHandler)
+			client, e := s.newQiNiuClient()
+			if e != nil {
+				workflow.SendItem("初始七牛客户端异常", e.Error(), nil, false)
+				return
+			}
+			err := client.DeleteFile(args[0])
+			if err != nil {
+				workflow.SendItem("删除文件完成", "删除失败,"+err.Error(), nil, false)
+			} else {
+				workflow.SendItem("删除文件完成", "删除完成", nil, false)
+			}
 		},
 	}
 )
