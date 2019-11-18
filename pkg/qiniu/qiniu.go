@@ -47,13 +47,11 @@ func (c *Client) UploadFile(filename, filepath string) (*Response, error) {
 }
 
 func (c *Client) ListFile(prefix string, limit int) ([]storage.ListItem, error) {
-	region, err := storage.GetRegion(c.credential.AccessKey, c.bucketName)
-	if err != nil {
-		return nil, err
+	storageCfg, e := c.newStorageConfig()
+	if e != nil {
+		return nil, e
 	}
-	bucketManager := storage.NewBucketManager(c.mc, &storage.Config{
-		Region: region,
-	})
+	bucketManager := storage.NewBucketManager(c.mc, storageCfg)
 	delimiter := ""
 	marker := ""
 	result := make([]storage.ListItem, 0)
@@ -71,6 +69,17 @@ func (c *Client) ListFile(prefix string, limit int) ([]storage.ListItem, error) 
 		marker = nextMarker
 	}
 	return result, nil
+}
+
+func (c *Client) newStorageConfig() (*storage.Config, error) {
+	region, err := storage.GetRegion(c.credential.AccessKey, c.bucketName)
+	if err != nil {
+		return nil, err
+	}
+	storageCfg := &storage.Config{
+		Region: region,
+	}
+	return storageCfg, nil
 }
 
 func FormatPutTime(putTime int64) time.Time {

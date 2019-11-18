@@ -5,6 +5,7 @@ import (
 	"github.com/LeeWaiHo/workflows/pkg/qiniu"
 	"github.com/LeeWaiHo/workflows/pkg/workflow"
 	"github.com/pkg/errors"
+	"github.com/qiniu/api.v7/v7/storage"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"path"
@@ -66,11 +67,14 @@ var (
 				return
 			}
 			for _, v := range items {
-				subTitle := fmt.Sprintf("创建时间:%s\t文件大小:%dB",
+				subTitle := fmt.Sprintf("创建时间:%s\t文件大小:%dB\t文件类型:%s",
 					qiniu.FormatPutTime(v.PutTime).Format(time.RFC3339),
-					v.Fsize,
+					v.Fsize, v.MimeType,
 				)
-				wf.AddItem(workflow.NewItem(v.Key, subTitle, nil, false))
+				wf.AddItem(workflow.NewItem(v.Key, subTitle, map[string]string{
+					"key": v.Key,
+					"url": storage.MakePublicURL(viper.GetString("qiniu.domain"), v.Key),
+				}, false))
 			}
 			wf.Send()
 			return
