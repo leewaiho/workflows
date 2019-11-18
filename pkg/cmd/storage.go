@@ -74,7 +74,7 @@ var (
 				wf.AddItem(workflow.NewItem(v.Key, subTitle, map[string]string{
 					"key": v.Key,
 					"url": storage.MakePublicURL(viper.GetString("qiniu.domain"), v.Key),
-				}, false))
+				}, true))
 			}
 			wf.Send()
 			return
