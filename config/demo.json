@@ -4,5 +4,11 @@
 			"hint": "嘿嘿嘿",
 			"secret": "WWOFJY44HUGB2VIGKRTXXQS5I7PAZXAA"
 		}
+	},
+	"qiniu": {
+		"bucketName": "",
+		"accessKey": "",
+		"secretKey": "",
+		"domain": ""
 	}
 }
