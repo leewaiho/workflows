@@ -49,7 +49,11 @@ var (
 					succeed++
 				}
 			}
-			workflow.SendItem("上传文件完成", fmt.Sprintf("总共%d个,成功%d个,失败%d个", total, succeed, failed), nil, false)
+			result := fmt.Sprintf("总共%d个,成功%d个,失败%d个", total, succeed, failed)
+			workflow.SendItem("上传文件完成", result, map[string]string{
+				"result": result,
+			}, false)
+			return
 		},
 	}
 	storageListCmd = &cobra.Command{
@@ -99,15 +103,25 @@ var (
 			s := new(StorageHandler)
 			client, e := s.newQiNiuClient()
 			if e != nil {
-				workflow.SendItem("初始七牛客户端异常", e.Error(), nil, false)
+				result := fmt.Sprintf("初始七牛客户端异常:%s", e.Error())
+				workflow.SendItem("初始七牛客户端异常", e.Error(), map[string]string{
+					"result": result,
+				}, false)
 				return
 			}
 			err := client.DeleteFile(args[0])
 			if err != nil {
-				workflow.SendItem("删除文件完成", "删除失败,"+err.Error(), nil, false)
+				result := "删除失败," + err.Error()
+				workflow.SendItem("删除文件完成", result, map[string]string{
+					"result": result,
+				}, false)
 			} else {
-				workflow.SendItem("删除文件完成", "删除完成", nil, false)
+				result := "删除成功"
+				workflow.SendItem("删除文件完成", result, map[string]string{
+					"result": result,
+				}, false)
 			}
+			return
 		},
 	}
 )
