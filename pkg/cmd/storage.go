@@ -17,7 +17,6 @@ import (
 func init() {
 	rootCmd.AddCommand(storageCmd)
 	storageCmd.AddCommand(storagePutCmd)
-	storageCmd.AddCommand(storageDeleteCmd)
 	storageCmd.AddCommand(storageListCmd)
 }
 
@@ -87,40 +86,6 @@ var (
 				}, true))
 			}
 			wf.Send()
-			return
-		},
-	}
-	storageDeleteCmd = &cobra.Command{
-		Use:   "delete",
-		Short: "删除文件",
-		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) != 1 {
-				errMsg := fmt.Sprintf("期望参数:1个, 实际参数%d个", len(args))
-				item := workflow.NewItem("删除文件失败", errMsg, nil, false)
-				workflow.SendItems(item)
-				return
-			}
-			s := new(StorageHandler)
-			client, e := s.newQiNiuClient()
-			if e != nil {
-				result := fmt.Sprintf("初始七牛客户端异常:%s", e.Error())
-				workflow.SendItem("初始七牛客户端异常", e.Error(), map[string]string{
-					"result": result,
-				}, false)
-				return
-			}
-			err := client.DeleteFile(args[0])
-			if err != nil {
-				result := "删除失败," + err.Error()
-				workflow.SendItem("删除文件完成", result, map[string]string{
-					"result": result,
-				}, false)
-			} else {
-				result := "删除成功"
-				workflow.SendItem("删除文件完成", result, map[string]string{
-					"result": result,
-				}, false)
-			}
 			return
 		},
 	}
