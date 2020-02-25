@@ -17,6 +17,7 @@ import (
 func init() {
 	rootCmd.AddCommand(storageCmd)
 	storageCmd.AddCommand(storagePutCmd)
+	storageCmd.AddCommand(storageDeleteCmd)
 	storageCmd.AddCommand(storageListCmd)
 }
 
