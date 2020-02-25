@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/LeeWaiHo/workflows/pkg/cmd"
+	"github.com/LeeWaiHo/workflows/api/cmd"
 	"log"
 )
 
 func main() {
 	if e := cmd.Execute(); e != nil {
-		log.Fatal(e)
+		log.Fatalln(e)
 	}
 }

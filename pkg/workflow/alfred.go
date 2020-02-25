@@ -21,9 +21,20 @@ func SendItems(items ...*aw.Item) {
 	if len(items) == 0 {
 		return
 	}
+	sendItems(items...)
+	return
+}
+
+func sendItems(items ...*aw.Item) {
 	wf := aw.New()
 	wf.Feedback.Items = items
 	wf.SendFeedback()
+}
+
+func SendFeedback(title, desc string) {
+	f := aw.NewFeedback()
+	f.NewItem(title).Subtitle(desc).Valid(false).Icon(aw.IconError)
+	return
 }
 
 func HandleError(e error, msg string) {

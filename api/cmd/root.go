@@ -4,6 +4,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"log"
 	"os"
 )
 
@@ -18,6 +19,7 @@ var (
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "conf", "c", "", "配置文件路径 默认路径:$HOME/.workflows.json")
+	rootCmd.AddCommand(otpCommand, storageCommand)
 }
 
 func initConfig() {
@@ -29,13 +31,14 @@ func initConfig() {
 			os.Exit(1)
 		}
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".workflows")
+		viper.AddConfigPath(".")
+		viper.SetConfigType("json")
+		viper.SetConfigName("workflows")
 	}
-	if err := viper.ReadInConfig(); err == nil {
-		//log.Println("Using config file:", viper.ConfigFileUsed())
-	} else {
-		panic(err)
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalln(err)
 	}
+	log.Printf("Using Config File: %s\n", viper.ConfigFileUsed())
 }
 
 func Execute() error {

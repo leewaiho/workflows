@@ -40,7 +40,15 @@ func (c *Client) DeleteFile(key string) error {
 	return bucketManager.Delete(viper.GetString("qiniu.bucketName"), key)
 }
 
-func (c *Client) UploadFile(filename, filepath string) (*Response, error) {
+type UploadResponse struct {
+	Key      string `json:"key"`
+	Hash     string `json:"hash"`
+	FileSize int    `json:"fileSize"`
+	Bucket   string `json:"bucket"`
+	Name     string `json:"name"`
+}
+
+func (c *Client) UploadFile(filename, filepath string) (*UploadResponse, error) {
 	policy := storage.PutPolicy{
 		Scope:      c.bucketName,
 		ReturnBody: `{"key":"$(key)","hash":"$(etag)","fileSize":$(fsize),"bucket":"$(bucket)","name":"$(x:name)"}`,
@@ -48,7 +56,7 @@ func (c *Client) UploadFile(filename, filepath string) (*Response, error) {
 	token := policy.UploadToken(c.mc)
 	cfg := &storage.Config{}
 	formUploader := storage.NewFormUploader(cfg)
-	resp := new(Response)
+	resp := new(UploadResponse)
 	err := formUploader.PutFile(context.Background(), resp, token, filename, filepath, nil)
 	if err != nil {
 		return nil, err

@@ -3,16 +3,17 @@ package qiniu
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/LeeWaiHo/workflows/utils"
 	"testing"
 	"time"
 )
 
-var (
-	c = NewClient("leewaiho", "LkyS9lQUBfviYh-2XwUGAv-IsNAlFUO2Zes8TcZN", "8j4l80AzmM7yN13lviha8MjPtPYUE9Wa-b1vZC0k")
-)
+func newTestClient() *Client {
+	return NewClient("leewaiho", utils.GetEnvOrDie("QINIU_ACCESS_TOKEN"), utils.GetEnvOrDie("QINIU_SECRET_TOKEN"))
+}
 
 func TestUploadFile(t *testing.T) {
-	resp, e := c.UploadFile("99B847EF-DF8B-4F8E-92C9-280CB40697BD.png", "/Users/leewaiho/Downloads/99B847EF-DF8B-4F8E-92C9-280CB40697BD.png")
+	resp, e := newTestClient().UploadFile("99B847EF-DF8B-4F8E-92C9-280CB40697BD.png", "/Users/leewaiho/Downloads/99B847EF-DF8B-4F8E-92C9-280CB40697BD.png")
 	if e != nil {
 		t.Log(e)
 	}
@@ -20,8 +21,8 @@ func TestUploadFile(t *testing.T) {
 	t.Log(string(bs))
 }
 
-func TestClient_ListFiles(t *testing.T) {
-	items, e := c.ListFile("", 5)
+func TestListFiles(t *testing.T) {
+	items, e := newTestClient().ListFile("", 5)
 	if e != nil {
 		t.Error(e)
 	}
